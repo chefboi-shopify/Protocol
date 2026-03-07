@@ -1,0 +1,16 @@
+run = "npm run build && npm start"
+entrypoint = "src/app/page.tsx"
+
+[nix]
+channel = "stable-24_11"
+
+[env]
+DATABASE_URL = "file:./dev.db"
+
+[deployment]
+run = ["sh", "-c", "npm run build && npm start"]
+build = ["sh", "-c", "npm install && npx prisma generate && npx prisma db push"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80

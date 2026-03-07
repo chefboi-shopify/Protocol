@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .input-field {
+    @apply w-full bg-neutral-900 border border-neutral-800 px-4 py-3 font-mono text-sm text-neutral-200 rounded-none transition-colors;
+  }
+  .input-field:focus {
+    @apply border-neutral-600;
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: #0a0a0a;
+  color: #e5e5e5;
+}
+
+::selection {
+  background: #334155;
+  color: #f5f5f5;
+}
+
+input,
+textarea,
+select {
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #525252;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #262626;
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}

@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                 String    @id @default(uuid())
+  name               String
+  age                Int
+  gender             String    @default("M")
+  interestedIn       String    @default("ALL")
+
+  fiscalArchetype    String
+  archetypeChangedAt DateTime?
+  attachmentStyle    String    @default("")
+  socialBattery      String    @default("")
+  lifePace           String    @default("")
+
+  videoUrl           String?
+  locationCity       String    @default("")
+  locationLat        Float?
+  locationLng        Float?
+  dailySwipesLeft    Int       @default(20)
+  lastSwipeDate      DateTime  @default(now())
+  reliabilityScore   Int       @default(100)
+  isGhostMode        Boolean   @default(false)
+
+  targetMinAge        Int      @default(28)
+  targetMaxAge        Int      @default(45)
+  targetArchetypes    String   @default("The Architect,The Experientialist,The Minimalist,The Builder")
+  targetAttachment    String   @default("")
+  targetSocialBattery String   @default("")
+  targetLifePace      String   @default("")
+
+  religion           String    @default("")
+  politicalLeaning   String    @default("")
+  kidsPreference     String    @default("")
+  targetReligion     String    @default("")
+  targetPolitical    String    @default("")
+  targetKids         String    @default("")
+
+  dealbreakers       String    @default("")
+  strongPreferences  String    @default("")
+  tags               String    @default("")
+
+  // Chat moderation
+  chatStrikes        Int       @default(0)
+  shadowBannedUntil  DateTime?
+
+  // Subscription (Season Pass)
+  subscriptionStatus String    @default("NONE")
+  stripeCustomerId   String?
+  stripeSessionId    String?
+  subscriptionPaidAt DateTime?
+  subscriptionAmount Int       @default(0)
+
+  // Joint exit
+  jointExitCode      String?
+  jointExitPartner   String?
+
+  createdAt          DateTime  @default(now())
+
+  matchesAsUser1  Match[]       @relation("MatchUser1")
+  matchesAsUser2  Match[]       @relation("MatchUser2")
+  sentMessages    Message[]
+  endorsements    Endorsement[]
+  debriefs        Debrief[]
+
+  @@map("users")
+}
+
+model Endorsement {
+  id         String   @id @default(uuid())
+  fromUserId String
+  toUserId   String
+  createdAt  DateTime @default(now())
+
+  fromUser   User     @relation(fields: [fromUserId], references: [id])
+
+  @@unique([fromUserId, toUserId])
+  @@map("endorsements")
+}
+
+model Pass {
+  id         String   @id @default(uuid())
+  fromUserId String
+  toUserId   String
+  createdAt  DateTime @default(now())
+
+  @@unique([fromUserId, toUserId])
+  @@map("passes")
+}
+
+model Match {
+  id               String    @id @default(uuid())
+  user1Id          String
+  user2Id          String
+  status           String    @default("ACTIVE")
+  createdAt        DateTime  @default(now())
+  expiresAt        DateTime
+
+  protocolDate     DateTime?
+  protocolTime     String?
+  protocolLocation String?
+  protocolNote     String?
+  protocolSetBy    String?
+  protocolSetAt    DateTime?
+
+  user1TriedToSchedule Boolean @default(false)
+  user2TriedToSchedule Boolean @default(false)
+
+  // 72-hour extension
+  extensionRequestedBy  String?
+  extensionRequestedAt  DateTime?
+  extensionUser1Paid    Boolean  @default(false)
+  extensionUser2Paid    Boolean  @default(false)
+  extensionStripeId1    String?
+  extensionStripeId2    String?
+  extensionApplied      Boolean  @default(false)
+
+  user1     User      @relation("MatchUser1", fields: [user1Id], references: [id])
+  user2     User      @relation("MatchUser2", fields: [user2Id], references: [id])
+  messages  Message[]
+  debriefs  Debrief[]
+
+  @@index([user1Id, status])
+  @@index([user2Id, status])
+  @@index([status, expiresAt])
+  @@map("matches")
+}
+
+model Message {
+  id          String   @id @default(uuid())
+  matchId     String
+  senderId    String
+  content     String
+  isSystem    Boolean  @default(false)
+  isScreened  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  match     Match    @relation(fields: [matchId], references: [id])
+  sender    User     @relation(fields: [senderId], references: [id])
+
+  @@index([matchId, createdAt])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model Debrief {
+  id        String   @id @default(uuid())
+  matchId   String
+  userId    String
+  showed    Boolean
+  rating    Int
+  note      String?
+  createdAt DateTime @default(now())
+
+  match     Match    @relation(fields: [matchId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([matchId, userId])
+  @@map("debriefs")
+}
+
+model WaitlistSignup {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String   @unique
+  city      String
+  createdAt DateTime @default(now())
+
+  @@index([city])
+  @@map("waitlist_signups")
+}
