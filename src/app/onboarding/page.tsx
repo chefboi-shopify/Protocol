@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronRight,
@@ -74,7 +75,37 @@ const SOFT_FILTER_OPTIONS = [
 const RECORD_DURATION = 15;
 const TOTAL_STEPS = 6;
 
-export default function OnboardingPage() {
+import { Suspense } from "react";
+
+const OWNER_KEY = process.env.NEXT_PUBLIC_OWNER_KEY || "protocol-owner-2026";
+
+export default function OnboardingWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <OnboardingGate />
+    </Suspense>
+  );
+}
+
+function OnboardingGate() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
+
+  useEffect(() => {
+    const key = searchParams.get("key");
+    if (key === OWNER_KEY) {
+      setAuthorized(true);
+    } else {
+      router.replace("/waitlist");
+    }
+  }, [searchParams, router]);
+
+  if (!authorized) return null;
+  return <OnboardingPage />;
+}
+
+function OnboardingPage() {
   const [step, setStep] = useState(0);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
