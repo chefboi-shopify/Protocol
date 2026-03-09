@@ -14,7 +14,7 @@ const NAV_ITEMS = [
 export function NavBar() {
   const pathname = usePathname();
 
-  if (pathname === "/onboarding" || pathname === "/" || pathname === "/activated" || pathname === "/subscribe" || pathname === "/joint-exit" || pathname === "/waitlist") return null;
+  if (pathname === "/onboarding" || pathname === "/" || pathname === "/activated" || pathname === "/subscribe" || pathname === "/joint-exit" || pathname === "/waitlist" || pathname === "/admin") return null;
 
   return (
     <nav className="sticky top-0 z-50 border-b border-neutral-800 bg-neutral-950/95 backdrop-blur-sm">
